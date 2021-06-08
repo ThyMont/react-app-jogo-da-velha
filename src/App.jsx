@@ -2,6 +2,8 @@ import Header from './components/Header';
 import Board from './components/Board';
 import BoardSpots from './components/BoardSpots';
 import { useEffect, useState } from 'react';
+import { board as baseBoard } from './json/board.json';
+import { getNewId } from './services/idService';
 
 export default function App() {
   const [user, setUser] = useState(true);
@@ -10,41 +12,67 @@ export default function App() {
 
   useEffect(() => {
     const newBoard = [
-      ['', '', ''],
-      ['', '', ''],
-      ['', '', ''],
+      [baseBoard[0], baseBoard[1], baseBoard[2]],
+      [baseBoard[3], baseBoard[4], baseBoard[5]],
+      [baseBoard[6], baseBoard[7], baseBoard[8]],
     ];
     setBoard(newBoard);
   }, []);
 
-  const handleClickSpot = (spotId) => {
+  const handleClickSpot = (coordinates) => {
+    const [x, y] = coordinates;
     const spot = user ? 'X' : 'O';
     const newBoard = [...board];
-    newBoard[spotId[0]][spotId[1]] = spot;
+    newBoard[x][y].play = spot;
     setBoard(newBoard);
-    checkBoard(spotId);
+    checkBoard(coordinates);
     setUser((currentUser) => !currentUser);
   };
-  const restart = () => {};
+  const restart = () => {
+    let newBoard = [...board];
+    newBoard = newBoard.map((row) =>
+      row.map((spot) => {
+        spot.play = '';
+        return spot;
+      })
+    );
+    setBoard(newBoard);
+  };
 
-  const checkBoard = (spotId) => {
+  const checkBoard = (coordinates) => {
     //false = sem ganhador
     //true = com ganhador
-    const [x, y] = spotId;
+    const [x, y] = coordinates;
     const b = [...board];
     const search = user ? 'X' : 'O';
     //verificar horizontal
 
-    if (b[x][0] === search && b[x][1] === search && b[x][2] === search) {
+    if (
+      b[x][0].play === search &&
+      b[x][1].play === search &&
+      b[x][2].play === search
+    ) {
       console.log('ganhou ' + search);
     }
-    if (b[0][y] === search && b[1][y] === search && b[2][y] === search) {
+    if (
+      b[0][y].play === search &&
+      b[1][y].play === search &&
+      b[2][y].play === search
+    ) {
       console.log('ganhou ' + search);
     }
-    if (b[0][0] === search && b[1][1] === search && b[2][2] === search) {
+    if (
+      b[0][0].play === search &&
+      b[1][1].play === search &&
+      b[2][2].play === search
+    ) {
       console.log('ganhou ' + search);
     }
-    if (b[2][0] === search && b[1][1] === search && b[0][2] === search) {
+    if (
+      b[2][0].play === search &&
+      b[1][1].play === search &&
+      b[0][2].play === search
+    ) {
       console.log('ganhou ' + search);
     }
   };
@@ -63,75 +91,20 @@ export default function App() {
         <Board>
           <table className="mx-auto">
             <tbody>
-              <tr>
-                <td>
-                  <BoardSpots
-                    spotId={[0, 0]}
-                    user={user}
-                    onClickBoardSpot={handleClickSpot}
-                  ></BoardSpots>
-                </td>
-                <td>
-                  <BoardSpots
-                    spotId={[0, 1]}
-                    user={user}
-                    onClickBoardSpot={handleClickSpot}
-                  ></BoardSpots>
-                </td>
-                <td>
-                  <BoardSpots
-                    spotId={[0, 2]}
-                    user={user}
-                    onClickBoardSpot={handleClickSpot}
-                  ></BoardSpots>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <BoardSpots
-                    spotId={[1, 0]}
-                    user={user}
-                    onClickBoardSpot={handleClickSpot}
-                  ></BoardSpots>
-                </td>
-                <td>
-                  <BoardSpots
-                    spotId={[1, 1]}
-                    user={user}
-                    onClickBoardSpot={handleClickSpot}
-                  ></BoardSpots>
-                </td>
-                <td>
-                  <BoardSpots
-                    spotId={[1, 2]}
-                    user={user}
-                    onClickBoardSpot={handleClickSpot}
-                  ></BoardSpots>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <BoardSpots
-                    spotId={[2, 0]}
-                    user={user}
-                    onClickBoardSpot={handleClickSpot}
-                  ></BoardSpots>
-                </td>
-                <td>
-                  <BoardSpots
-                    spotId={[2, 1]}
-                    user={user}
-                    onClickBoardSpot={handleClickSpot}
-                  ></BoardSpots>
-                </td>
-                <td>
-                  <BoardSpots
-                    spotId={[2, 2]}
-                    user={user}
-                    onClickBoardSpot={handleClickSpot}
-                  ></BoardSpots>
-                </td>
-              </tr>
+              {board.map((row) => (
+                <tr key={getNewId()}>
+                  {row.map((spot) => (
+                    <td key={getNewId()}>
+                      <BoardSpots
+                        coordinates={[spot.x, spot.y]}
+                        background={spot.play}
+                        play={spot.play}
+                        onClickBoardSpot={handleClickSpot}
+                      ></BoardSpots>
+                    </td>
+                  ))}
+                </tr>
+              ))}
             </tbody>
           </table>
         </Board>
