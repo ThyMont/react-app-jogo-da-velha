@@ -9,6 +9,7 @@ export default function App() {
   const [user, setUser] = useState(true);
   const [playerMessage, setPlayerMessage] = useState('');
   const [board, setBoard] = useState([]);
+  const [gameContinue, setGameContinue] = useState(true);
 
   useEffect(() => {
     const newBoard = [
@@ -37,6 +38,7 @@ export default function App() {
       })
     );
     setBoard(newBoard);
+    setGameContinue(true);
   };
 
   const checkBoard = (coordinates) => {
@@ -45,13 +47,13 @@ export default function App() {
     const [x, y] = coordinates;
     const b = [...board];
     const search = user ? 'X' : 'O';
-    //verificar horizontal
 
     if (
       b[x][0].play === search &&
       b[x][1].play === search &&
       b[x][2].play === search
     ) {
+      setGameContinue((currentGameContinue) => !currentGameContinue);
       console.log('ganhou ' + search);
     }
     if (
@@ -59,6 +61,7 @@ export default function App() {
       b[1][y].play === search &&
       b[2][y].play === search
     ) {
+      setGameContinue((currentGameContinue) => !currentGameContinue);
       console.log('ganhou ' + search);
     }
     if (
@@ -66,6 +69,7 @@ export default function App() {
       b[1][1].play === search &&
       b[2][2].play === search
     ) {
+      setGameContinue((currentGameContinue) => !currentGameContinue);
       console.log('ganhou ' + search);
     }
     if (
@@ -73,7 +77,16 @@ export default function App() {
       b[1][1].play === search &&
       b[0][2].play === search
     ) {
+      setGameContinue((currentGameContinue) => !currentGameContinue);
       console.log('ganhou ' + search);
+    }
+    if (
+      b[0].findIndex((a) => a.play === '') < 0 &&
+      b[1].findIndex((a) => a.play === '') < 0 &&
+      b[2].findIndex((a) => a.play === '') < 0
+    ) {
+      setGameContinue((currentGameContinue) => !currentGameContinue);
+      console.log('Empatou');
     }
   };
 
@@ -100,6 +113,7 @@ export default function App() {
                         background={spot.play}
                         play={spot.play}
                         onClickBoardSpot={handleClickSpot}
+                        doGameContinue={gameContinue}
                       ></BoardSpots>
                     </td>
                   ))}

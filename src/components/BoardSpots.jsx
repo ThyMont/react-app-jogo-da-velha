@@ -4,7 +4,7 @@ import empty from '../img/empty.png';
 export default function BoardSpots({
   play = null,
   onClickBoardSpot = null,
-
+  doGameContinue,
   coordinates,
 }) {
   let background = '';
@@ -15,7 +15,7 @@ export default function BoardSpots({
   }
 
   const handleSpotClick = () => {
-    if (onClickBoardSpot) {
+    if (onClickBoardSpot && doGameContinue) {
       onClickBoardSpot(coordinates);
     }
   };
