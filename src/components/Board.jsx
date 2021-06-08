@@ -1,7 +1,7 @@
-export default function Board() {
+export default function Board({ children }) {
   return (
-    <div className="container mx-auto p-4 text-center">
-      <h2>Aqui é o tabuleiro</h2>
+    <div className="shadow container mx-auto p-4 sm:max-w-xsfull content-center">
+      {children}
     </div>
   );
 }
