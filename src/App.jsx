@@ -4,10 +4,14 @@ import BoardSpots from './components/BoardSpots';
 import { useEffect, useState } from 'react';
 import { board as baseBoard } from './json/board.json';
 import { getNewId } from './services/idService';
+import jump from './sounds/jump.mp3';
+import draw from './sounds/draw.mp3';
+import win from './sounds/win.mp3';
 
 export default function App() {
   const [user, setUser] = useState(true);
   const [playerMessage, setPlayerMessage] = useState('');
+  const [finalMessage, setFinalMessage] = useState(null);
   const [board, setBoard] = useState([]);
   const [gameContinue, setGameContinue] = useState(true);
 
@@ -21,6 +25,8 @@ export default function App() {
   }, []);
 
   const handleClickSpot = (coordinates) => {
+    const audio = new Audio(jump);
+    audio.play();
     const [x, y] = coordinates;
     const spot = user ? 'X' : 'O';
     const newBoard = [...board];
@@ -29,6 +35,7 @@ export default function App() {
     checkBoard(coordinates);
     setUser((currentUser) => !currentUser);
   };
+
   const restart = () => {
     let newBoard = [...board];
     newBoard = newBoard.map((row) =>
@@ -39,6 +46,7 @@ export default function App() {
     );
     setBoard(newBoard);
     setGameContinue(true);
+    setFinalMessage(null);
   };
 
   const checkBoard = (coordinates) => {
@@ -47,46 +55,48 @@ export default function App() {
     const [x, y] = coordinates;
     const b = [...board];
     const search = user ? 'X' : 'O';
+    const makeWin = () => {
+      setGameContinue((currentGameContinue) => !currentGameContinue);
+      setFinalMessage(`${playerMessage} Venceu!`);
+      const audio = new Audio(win);
+      audio.play();
+    };
 
     if (
       b[x][0].play === search &&
       b[x][1].play === search &&
       b[x][2].play === search
-    ) {
-      setGameContinue((currentGameContinue) => !currentGameContinue);
-      console.log('ganhou ' + search);
-    }
+    )
+      makeWin();
     if (
       b[0][y].play === search &&
       b[1][y].play === search &&
       b[2][y].play === search
-    ) {
-      setGameContinue((currentGameContinue) => !currentGameContinue);
-      console.log('ganhou ' + search);
-    }
+    )
+      makeWin();
+
     if (
       b[0][0].play === search &&
       b[1][1].play === search &&
       b[2][2].play === search
-    ) {
-      setGameContinue((currentGameContinue) => !currentGameContinue);
-      console.log('ganhou ' + search);
-    }
+    )
+      makeWin();
     if (
       b[2][0].play === search &&
       b[1][1].play === search &&
       b[0][2].play === search
-    ) {
-      setGameContinue((currentGameContinue) => !currentGameContinue);
-      console.log('ganhou ' + search);
-    }
+    )
+      makeWin();
+
     if (
       b[0].findIndex((a) => a.play === '') < 0 &&
       b[1].findIndex((a) => a.play === '') < 0 &&
       b[2].findIndex((a) => a.play === '') < 0
     ) {
       setGameContinue((currentGameContinue) => !currentGameContinue);
-      console.log('Empatou');
+      setFinalMessage('Empatou');
+      const audio = new Audio(draw);
+      audio.play();
     }
   };
 
@@ -98,9 +108,15 @@ export default function App() {
   return (
     <div className="container text-center content-center mx-auto max-w-full">
       <Header>React Jogo da Velha</Header>
-      <h1>{playerMessage}</h1>
-      <button onClick={restart}>Reiniciar</button>
-      <div>
+      <h1>{finalMessage || `${playerMessage}, é a sua vez!`}</h1>
+
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold my-1 py-2 px-4 rounded"
+        onClick={restart}
+      >
+        Reiniciar
+      </button>
+      <div className="bg-gradient-to-br from-blue-200 via-blue-600 to-blue-800">
         <Board>
           <table className="mx-auto">
             <tbody>
